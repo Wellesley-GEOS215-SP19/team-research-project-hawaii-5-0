@@ -143,6 +143,12 @@ for i = 1:1
     end 
 end 
 
-%% Step #3c Plot SST and Sea Level Rise
+sstYears = zeros(127,1);
+sstYears(1,1) = 1891;
+for i = 2:127
+    sstYears(i,1) = sstYears(i-1,1) +1;
+end 
 
-  
+%% Step #3c Plot SST over time
+plot(sstYears(2:127,:), sstYearlyMean(2:127,:));
+%%
