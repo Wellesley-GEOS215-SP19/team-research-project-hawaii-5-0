@@ -29,13 +29,13 @@ figure(1); clf;
 %sea level (mm) by time 1860-present
 plot(globalslr(:,1),globalslr(:,2));
 xlabel('Years');
-ylabel('Change in Sea Level (mm)');
+ylabel('Change is Sea Level (mm)');
 
 figure(2); clf;
 %sea level (mm) by time 1860-present
 plot(yearList(:,1),yearList(:,2));
 xlabel('Years');
-ylabel('Change in Sea Level (mm)');
+ylabel('Change is Sea Level (mm)');
 
 %% Step #2 load in dataset 2 --> local sea level rise, Hawaii cities 
 % info: from 1927-present
@@ -59,23 +59,11 @@ cityLat = [21.30700, 21.96700, 20.90000, 19.73300, 21.43300, 21.32000, 20.78000,
 cityLon = [-157.86700, -159.35000, -156.46700, -155.06700, -157.80000, -158.12000, -156.90000, -155.83300]
 
 %%
-%convert years from scientific notation to decimal notation
-honYears = table2array(unique(honolulu(:,1)));
-
-k=1;
-for year = honYears(1):honYears(end)              
-    honList(k,1) = year;
-    indYear = find(table2array(honolulu(:,1)) == year);
-    yearMean = mean(table2array(honolulu(indYear,4)));
-    honList(k,2) = yearMean;
-    k=k+1;
-end
-%%
 figure(3); clf;
 %sea level (mm) by time 1860-present
-plot(honList(:,1),honList(:,2));
+plot(hon(:,1),yearList(:,2));
 xlabel('Years');
-ylabel('Change in Sea Level (mm)');
+ylabel('Change is Sea Level (mm)');
 %%
 figure(4); clf
 worldmap([18 23],[-160 -154])
