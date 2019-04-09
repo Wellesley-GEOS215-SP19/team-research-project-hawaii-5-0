@@ -2,7 +2,7 @@
 % Hawaii sea level rise
 
 %% Step #1: load in dataset 1 --> monthly global mean sea level rise 1870-2001 from .txt file
-% File info: Columns: Year, Sea Level (?), Standard deva
+% File info: Columns: Year, Sea Level (mm) from, Standard deva
 fileID = fopen('church_white_grl_gmsl.txt','r');
 rawglobalslr = fscanf(fileID,'%f %f %f',[3, Inf]);
 fclose(fileID);
@@ -76,9 +76,32 @@ for i = 1:10
     end 
 end 
 
+%removes missing values by averaging over local area
+for i = 1:10
+    for j = 1:6
+        for k = 1:127
+           if (sstYearlyHawaii(i,j,k) > 1000000)
+                   sstYearlyHawaii(i,j,k) = (sstYearlyHawaii(i+1,j,k) + sstYearlyHawaii(i-1,j,k)+sstYearlyHawaii(i,j+1,k) + sstYearlyHawaii(i,j-1,k))/4;                         
+           end 
+        end 
+    end 
+end 
+
+%take the yearly average
 sstYearlyHawaii = sstYearlyHawaii/12;
 
-%% Step #3c Plot SST and Sea Level Rise
+%This is the average over each page so the value for all of Hawaii
+sstYearly3D =  mean(sstYearlyHawaii,[1 2]);
+sstYearlyMean = zeros(127,1);
 
+for i = 1:1
+    for j = 1:1
+        for k = 1:127
+           sstYearlyMean(k,1) = sstYearly3D(i,j,k);
+        end 
+    end 
+end 
+
+%% Step #3c Plot SST and Sea Level Rise
 
   
