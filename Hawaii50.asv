@@ -91,30 +91,25 @@ mokSort = rmoutliers(mokuoloe);
 barSort = rmoutliers(barberspt);
 kauSort = rmoutliers(kaumalapau);
 kawSort = rmoutliers(kawaihae);
-
-% figure(3); clf;
-% subplot(2,1,1);
-% plot(honSort(:,1),honSort(:,2));
-% subplot(2,1,2);
-% plot(honolulu(:,1),honolulu(:,2));
-%% plotting each local sea level rise (with and without outliers)
+figure(3); clf;
+subplot(2,1,1);
+plot(honSort(:,1),honSort(:,2));
+subplot(2,1,2);
+plot(honolulu(:,1),honolulu(:,2));
+%% plotting each local sea level rise
 
 placeNames = {honolulu nawiliwili kahului hilo mokuoloe barberspt kaumalapau kawaihae};
-sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSort, kauSort, kawSort};
+sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSOrt, kauSort, kawSort);
 
 for num = 1:8
     figure(2+num); clf;
-%without outliers
-    %subplot(2,1,1);
-    plot(sortedNames{num}(:,1),sortedNames{num}(:,2)); 
-%with outliers
-%     subplot(2,1,2);
-%     plot(placeNames{num}(:,1),placeNames{num}(:,2)); %with outliers
+    subplot(2,1,1);
+    plot(placeNames{num}(:,1),placeNames{num}(:,2));
     xlabel('Years');
     ylabel('Change in Sea Level (mm)');
 end
 %%
-figure(11); clf
+figure(4); clf
 worldmap([18 23],[-160 -154])
 geoshow('landareas.shp','FaceColor','black')
 title('Tidal Gauge Locations')
