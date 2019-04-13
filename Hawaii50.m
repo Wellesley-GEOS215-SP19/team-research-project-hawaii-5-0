@@ -105,14 +105,26 @@ sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSort, kauSort, ka
 for num = 1:8
     figure(2+num); clf;
 %without outliers
-    %subplot(2,1,1);
+    subplot(2,1,1);
     plot(sortedNames{num}(:,1),sortedNames{num}(:,2)); 
 %with outliers
-%     subplot(2,1,2);
-%     plot(placeNames{num}(:,1),placeNames{num}(:,2)); %with outliers
+    subplot(2,1,2);
+    plot(placeNames{num}(:,1),placeNames{num}(:,2)); %with outliers
     xlabel('Years');
     ylabel('Change in Sea Level (mm)');
 end
+
+%% plotting all local stations on one graph
+
+sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, kauSort, kawSort};
+for num = 1:7
+    plot(sortedNames{num}(:,1),sortedNames{num}(:,2),'LineWidth',2);
+    hold on
+end
+xlabel('Years');
+    ylabel('Change in Sea Level (mm)')
+legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kaumalapau','kawaihae');
+    
 %%
 figure(11); clf
 worldmap([18 23],[-160 -154])
