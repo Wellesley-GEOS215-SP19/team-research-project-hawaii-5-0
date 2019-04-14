@@ -122,7 +122,7 @@ for num = 1:7
     hold on
 end
 xlabel('Years');
-    ylabel('Change in Sea Level (mm)')
+ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kaumalapau','kawaihae');
     
 %%
@@ -151,7 +151,7 @@ ncfile = 'SST1x1Hawaii.nc' ; % nc file name
 ncinfo(ncfile);
 % to display nc file
 ncdisp(ncfile);
-% to read a vriable 'var' exisiting in nc file
+% to read a variable 'var' exisiting in nc file
 sstHawaii = ncread(ncfile,'sst');
 %% Step #3b: Average the SST for each year
 % ignore the last 'page' in this file)
