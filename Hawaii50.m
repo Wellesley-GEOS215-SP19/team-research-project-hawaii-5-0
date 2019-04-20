@@ -17,10 +17,10 @@ allYears = unique(fix(globalslr(:,1)));
 
 k=1;
 for year = allYears(1):allYears(end)              
-    yearList(k,1) = year;
+    globalMeans(k,1) = year;
     indYear = find(fix(globalslr(:,1)) == year);
     yearMean = mean(globalslr(indYear,2));
-    yearList(k,2) = yearMean;
+    globalMeans(k,2) = yearMean;
     k=k+1;
 end
 %% Step #1a: analyze dataset 1
@@ -33,7 +33,7 @@ ylabel('Change in Sea Level (mm)');
 
 figure(2); clf;
 %sea level (mm) by time 1860-present
-plot(yearList(:,1),yearList(:,2));
+plot(globalMeans(:,1),globalMeans(:,2));
 xlabel('Years');
 ylabel('Change in Sea Level (mm)');
 
@@ -56,9 +56,16 @@ kaumalapauData = readtable('d548_kaumalapau.csv');  %20.78000	-156.90000
 kawaihaeData = readtable('d552_kawaihae.csv');      %20.03300	-155.83300
 
 cityLat = [21.30700, 21.96700, 20.90000, 19.73300, 21.43300, 21.32000, 20.78000, 20.03300];
-cityLon = [-157.86700, -159.35000, -156.46700, -155.06700, -157.80000, -158.12000, -156.90000, -155.83300]
+cityLon = [-157.86700, -159.35000, -156.46700, -155.06700, -157.80000, -158.12000, -156.90000, -155.83300];
 
-%% figuring out how to convert monthly mean to yearly means
+%% plot tidal gauge locations
+figure(3); clf
+worldmap([18 23],[-160 -154])
+geoshow('landareas.shp','FaceColor','black')
+title('Tidal Gauge Locations')
+scatterm(cityLat,cityLon,50,'r','filled');
+
+%% Step #2b: For each location, average the data to yearly values
 %convert years from scientific notation to decimal notation
 % honYears = table2array(unique(honolulu(:,1)));
 % 
@@ -103,7 +110,7 @@ placeNames = {honolulu nawiliwili kahului hilo mokuoloe barberspt kaumalapau kaw
 sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSort, kauSort, kawSort};
 
 for num = 1:8
-    figure(2+num); clf;
+    figure(3+num); clf;
 %without outliers
     subplot(2,1,1);
     plot(sortedNames{num}(:,1),sortedNames{num}(:,2)); 
@@ -116,23 +123,41 @@ end
 
 %% plotting all local stations on one graph
 
-sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, kauSort, kawSort};
-for num = 1:7
+sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, kawSort};
+for num = 1:6
     plot(sortedNames{num}(:,1),sortedNames{num}(:,2),'LineWidth',2);
     hold on
 end
 xlabel('Years');
 ylabel('Sea Level (mm)')
-legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kaumalapau','kawaihae');
-    
-%%
-figure(11); clf
-worldmap([18 23],[-160 -154])
-geoshow('landareas.shp','FaceColor','black')
-title('Tidal Gauge Locations')
-scatterm(cityLat,cityLon,50,'r','filled');
+legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
 
-%% Step #2b: For each location, average the data to yearly values
+%% make an array of years by local stations and global sea level
+% might not want to do this!
+totalYears = unique([honolulu(:,1);nawiliwili(:,1);kahului(:,1);hilo(:,1);mokuoloe(:,1);kawaihae(:,1)]);
+placeNames = {honolulu nawiliwili kahului hilo mokuoloe kawaihae};
+
+seaLevel_grid = NaN*zeros(length(totalYears),7);  
+seaLevel_grid(:,1) = totalYears;
+
+for i = 1:6
+    place = placeNames{i};
+    for j = 1:length(place);
+        indYear = find(place(j,1) == totalYears);
+        seaLevel_grid(indYear,1+i) = place(j,2);
+    end
+end     
+
+seaLevel_grid_nooutliers = rmoutliers(seaLevel_grid);
+
+%% plot more
+for num = 1:6
+    plot(seaLevel_grid_nooutliers(:,1),seaLevel_grid_nooutliers(:,1+num),'LineWidth',2);
+    hold on
+end
+xlabel('Years');
+ylabel('Sea Level (mm)')
+legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
 
 %% Step #2c: Average the 7 cities for a 'Hawaiian' Sea level data set
 % maybe not do this? hard bc the cities have different time scales
