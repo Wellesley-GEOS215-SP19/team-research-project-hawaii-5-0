@@ -1,14 +1,8 @@
 %% Kalau, Nolen Belle, Grace
-% loading the local Hawaii SST data
-%
-%% Hawaii Data
-ncfile = 'SST1x1Hawaii.nc' ; % nc file name
-% To get information about the nc file
-ncinfo(ncfile);
-% to display nc file
-ncdisp(ncfile);
-% to read a vriable 'var' exisiting in nc file
-sstHawaii = ncread(ncfile,'sst');
+% This data set contains sst for 127 years from 1891 to near present
+% data smoothed for missing values
+% sstYearlyGlobal is the yearly averages for each 1x1 square
+% sstYearlyMean is the yearly average of the global sea surface
 
 %% Global Data
 ncfile = 'sst.mon.mean.global.nc' ; % nc file name
@@ -32,37 +26,263 @@ for i = 1:360
     end 
 end 
 
+sstYearlyGlobal = sstYearlyGlobal/12;
 %% removes missing values by averaging over local area
-%this doesn't run right now, not really sure why but since we might not
-%even ever want it, I'm not gonna try and fix it at this moment -NBB
 
 countA = 0;
-countB = 0;
+%countB = 0;
+countC = 0;
 missingDataA = zeros(2667127,3);
-missingDataB = zeros(1905,3);
+%missingDataB = zeros(44577,3);
+missingDataC = zeros(2606167,12);
 
 for i = 1:360
     for j = 1:180
         for k = 1:127
-           if (sstYearlyGlobal(i,j,k) > 1000000) %if it is missing
+           if (sstYearlyGlobal(i,j,k) > 100) %if it is missing
                   if (i>1) && (i<360) && (j>1) && (j<180) %if it isn't on edge
-                      if (sstYearlyGlobal(i+1,j,k) < 10000) && (sstYearlyGlobal(i-1,j,k) < 10000) && (sstYearlyGlobal(i,j+1,k) < 10000) && (sstYearlyGlobal(i,j-1,k) < 10000)
-                          %in the event that the sites around it are good
-                          %and it isnt on the edge, smooth the data
-                          sstYearlyGlobal(i,j,k) = (sstYearlyGlobal(i+1,j,k) + sstYearlyGlobal(i-1,j,k)+sstYearlyGlobal(i,j+1,k) + sstYearlyGlobal(i,j-1,k))/4; 
-                          countB = countB + 1;
-                          missingDataB(countB,:) = [i,j,k];
-                      end               
+                    countC = countC+1; 
+                    missingDataC(countC,1:3) = [i,j,k];
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i+1,j,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,4) = sstYearlyGlobal(i+1,j,k);
+                    end
+                    if (sstYearlyGlobal(i-1,j,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,5) = sstYearlyGlobal(i-1,j,k);
+                    end
+                    if (sstYearlyGlobal(i,j+1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i,j+1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,6) = sstYearlyGlobal(i,j+1,k);
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,7) = sstYearlyGlobal(i,j-1,k);
+                    end
+                    if (sstYearlyGlobal(i+1,j+1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j+1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,8) = sstYearlyGlobal(i+1,j+1,k);
+                    end
+                    if (sstYearlyGlobal(i-1,j-1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j-1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,9) = sstYearlyGlobal(i-1,j-1,k);
+                    end
+                    if (sstYearlyGlobal(i+1,j-1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j-1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,10) = sstYearlyGlobal(i+1,j-1,k);
+                    end
+                    if (sstYearlyGlobal(i-1,j+1,k) < 100)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j+1,k);
+                      tempCount = tempCount + 1;
+                      missingDataC(countC,11) = sstYearlyGlobal(i-1,j+1,k);
+                    end
+                    missingDataC(countC,12) = tempCount;
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount; %average of good neighbors
                   end
+                  %Now to smooth the missing data at the edge
                   countA = countA +1;
                   missingDataA(countA,:) = [i,j,k];
+                  if (i==1) && (j>1) && (j<180)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i+1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(360,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(360,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(360,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(360,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(360,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(360,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i+1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i+1,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount;
+                  end 
+                  if (i==360) && (j>1) && (j<180)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i-1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(1,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(1,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount; 
+                  end 
+                  if (j==1)&& (i>1) && (i<360)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i+1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i+1,j+1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j+1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount;
+                  end 
+                  if (j==180) && (i>1) && (i<360)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i+1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i+1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount;
+                  end 
+                  if (j==180) && (i==360)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i-1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i-1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount;
+                  end
+                  if (j==180) && (i==1)
+                    tempValue = 0;
+                    tempCount = 0;
+                    if (sstYearlyGlobal(i+1,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(360,j,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(360,j,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(360,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(360,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    if (sstYearlyGlobal(i+1,j-1,k) < 10000)
+                      tempValue = tempValue + sstYearlyGlobal(i+1,j-1,k);
+                      tempCount = tempCount + 1;
+                    end
+                    sstYearlyGlobal(i,j,k) = tempValue/tempCount;
+                  end
            end 
         end 
     end 
 end 
-
+%% Check 
+countB = 0;
+missingDataB = zeros(127,3);
+for i = 1:360
+    for j = 1:180
+        for k = 1:127
+           if (sstYearlyGlobal(i,j,k) > 100) %if it is missing
+               countB = countB+1;
+               missingDataB(k,1:3) = [i,j,k];
+           end 
+        end 
+    end 
+end 
 %% take the yearly average
-sstYearlyGlobal = sstYearlyGlobal/12;
 
 %This is the average over each page so the value for all of Hawaii
 sstYearly3D =  mean(sstYearlyGlobal,[1 2]);
@@ -72,7 +292,7 @@ for i = 1:1
     for j = 1:1
         for k = 1:127
            sstYearlyMean(k,1) = sstYearly3D(i,j,k);
-           if (sstYearlyMean(k,1)>100)
+           if (sstYearlyMean(k,1)>40)
                count = count +1;
            end
         end 

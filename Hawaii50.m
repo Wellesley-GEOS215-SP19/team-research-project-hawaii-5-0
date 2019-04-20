@@ -11,7 +11,7 @@ globalslr = rawglobalslr';
 
 %%
 %convert years from scientific notation to decimal notation
-allYears = unique(fix(globalslr(:,1)))
+allYears = unique(fix(globalslr(:,1)));
 %yearList = NaN*zeros(length(allYears),1);    
 % 
 
@@ -199,5 +199,6 @@ for i = 2:127
 end 
 
 %% Step #3c Plot SST over time
+figure(12); clf
 plot(sstYears(2:127,:), sstYearlyMean(2:127,:));
 %%
