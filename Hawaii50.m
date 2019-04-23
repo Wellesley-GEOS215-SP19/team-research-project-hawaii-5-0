@@ -159,9 +159,28 @@ xlabel('Years');
 ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
 
-%% Step #2c: Average the 7 cities for a 'Hawaiian' Sea level data set
-% maybe not do this? hard bc the cities have different time scales
-% instead going to calculate rates of change, I think
+%% Step #2c: Calculate rates of change for each station
+%base year = 1957, index 53 of seaLevel_grid
+%1957 to 2019
+
+seaLevel_grid_1957 = NaN*zeros(length(seaLevel_grid(53:end,1)),6);  
+seaLevel_grid_1957(:,:) = seaLevel_grid(53:end,1:6);
+
+for i = 2:6 %station indices
+    baseValue = seaLevel_grid_1957(1,i);
+    seaLevel_grid_1957(:,i) = seaLevel_grid_1957(:,i)-baseValue;
+end
+
+seaLevel_grid_1957_nooutliers = rmoutliers(seaLevel_grid_1957);
+
+%% Plotting for rates of change
+for num = 1:5
+    plot(seaLevel_grid_1957_nooutliers(:,1),seaLevel_grid_1957_nooutliers(:,2+num),'LineWidth',2);
+    hold on
+end
+xlabel('Years');
+ylabel('Sea Level (mm)')
+legend('honolulu','nawiliwili','kahului','hilo','mokuoloe');
 
 %% Step #3: load in dataset 3 --> global monthly SST 1891-present from .nc file
 % data from NOAA
