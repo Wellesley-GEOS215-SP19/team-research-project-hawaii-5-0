@@ -1,6 +1,7 @@
 %% Kalau, Nolen Belle, Grace
 % This data set contains sst for 127 years from 1891 to near present
 % data smoothed for missing values
+
 % sstYearlyGlobal is the yearly averages for each 1x1 square
 % sstYearlyMean is the yearly average of the global sea surface
 
