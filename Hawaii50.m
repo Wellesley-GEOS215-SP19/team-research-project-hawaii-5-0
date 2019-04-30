@@ -245,4 +245,34 @@ end
 %% Step #3c Plot SST over time
 figure(12); clf
 plot(sstYears(2:127,:), sstYearlyMean(2:127,:));
-%%
+
+
+%% Load Topographic basemap --> this pulls up a web-based topo map !
+
+% View Glider Path on Map from OpenTopoMap.org 
+% Add a custom basemap and plot the path of a glider on it.
+% Copyright 2018 The MathWorks, Inc.
+
+%this plots a sample dataset from the Matlab system, will try soon with
+%actual data of importance! -GC
+trk = gpxread('sample_mixed.gpx','FeatureType','track');
+
+name = 'opentopomap';
+url = 'a.tile.opentopomap.org';
+copyright = char(uint8(169));
+attribution = [ ...
+      "map data:  " + copyright + "OpenStreetMap contributors,SRTM", ...
+      "map style: " + copyright + "OpenTopoMap (CC-BY-SA)"];
+displayName = 'Open Topo Map';
+addCustomBasemap(name,url,'Attribution',attribution,'DisplayName',displayName)
+webmap opentopomap
+
+%this plots that sample data from above
+wmline(trk,'LineWidth',2)
+%% --> I cant get this to work rn Im just trying other basemap things
+figure(81)
+geobasemap('usgstopo');
+geolimits([18.0 22.5],[-161.0 -154.5]);
+
+%% Read in Hospital lat/lon dataset
+
