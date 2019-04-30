@@ -255,8 +255,9 @@ plot(sstYears(2:127,:), sstYearlyMean(2:127,:));
 
 %this plots a sample dataset from the Matlab system, will try soon with
 %actual data of importance! -GC
-trk = gpxread('sample_mixed.gpx','FeatureType','track');
+%trk = gpxread('sample_mixed.gpx','FeatureType','track');
 
+% Map buisness 
 name = 'opentopomap';
 url = 'a.tile.opentopomap.org';
 copyright = char(uint8(169));
@@ -267,12 +268,29 @@ displayName = 'Open Topo Map';
 addCustomBasemap(name,url,'Attribution',attribution,'DisplayName',displayName)
 webmap opentopomap
 
-%this plots that sample data from above
-wmline(trk,'LineWidth',2)
+for x=1:30
+    lat=Hospitals.latitude(x);
+    lon=Hospitals.longitude(x);
+    wmmarker(lat, lon);
+end
+
+%% TRYING TO PLOT POINTS
+pts = geopoint(Hospitals.latitude,Hospitals.longitude)
+gb = geobubble(Hospitals.Latitude,Hospitals.Longitude,'Basemap','opentopomap');
+gb.BubbleWidthRange = 20;
+gb.MapLayout = 'maximized';
+gb.ZoomLevel = 14;
+
+%% this plots that sample data from above
+%wmline(trk,'LineWidth',2)
+
+hold on
+geoscatter(Hospitals.latitude,Hospitals.longitude,'filled');
+geolimits([18.0 22.5],[-161.0 -154.5]);
+
 %% --> I cant get this to work rn Im just trying other basemap things
 figure(81)
 geobasemap('usgstopo');
 geolimits([18.0 22.5],[-161.0 -154.5]);
-
-%% Read in Hospital lat/lon dataset
-
+%%
+openExample('map/ViewLocationsPlacenamesBubblesOpenStreetMapExample')
