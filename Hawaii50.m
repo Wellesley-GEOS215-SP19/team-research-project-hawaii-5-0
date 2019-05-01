@@ -105,7 +105,7 @@ kawSort = rmoutliers(kawaihae);
 % subplot(2,1,2);
 % plot(honolulu(:,1),honolulu(:,2));
 %% plotting each local sea level rise (with and without outliers)
-
+Classification Learne
 placeNames = {honolulu nawiliwili kahului hilo mokuoloe barberspt kaumalapau kawaihae};
 sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSort, kauSort, kawSort};
 
@@ -142,7 +142,7 @@ seaLevel_grid(:,1) = totalYears;
 
 for i = 1:6
     place = placeNames{i};
-    for j = 1:length(place);
+    for j = 1:length(place)
         indYear = find(place(j,1) == totalYears);
         seaLevel_grid(indYear,1+i) = place(j,2);
     end
