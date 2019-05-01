@@ -148,7 +148,7 @@ for i = 1:6
     end
 end     
 
-seaLevel_grid_nooutliers = rmoutliers(seaLevel_grid);
+seaLevel_grid_nooutliers = rmoutliers(seaLevel_grid(2:end,1:end));
 
 %% plot more
 for num = 1:6
@@ -167,7 +167,7 @@ seaLevel_grid_1957 = NaN*zeros(length(seaLevel_grid(53:end,1)),6);
 seaLevel_grid_1957(:,:) = seaLevel_grid(53:end,1:6);
 
 for i = 2:6 %station indices
-    baseValue = seaLevel_grid_1957(1,i);
+    baseValue = seaLevel_grid_1957(13,i); %1969, index 13
     seaLevel_grid_1957(:,i) = seaLevel_grid_1957(:,i)-baseValue;
 end
 
@@ -175,12 +175,33 @@ seaLevel_grid_1957_nooutliers = rmoutliers(seaLevel_grid_1957);
 
 %% Plotting for rates of change
 for num = 1:5
-    plot(seaLevel_grid_1957_nooutliers(:,1),seaLevel_grid_1957_nooutliers(:,2+num),'LineWidth',2);
+    plot(seaLevel_grid_1957_nooutliers(:,1),seaLevel_grid_1957_nooutliers(:,1+num),'LineWidth',2);
     hold on
 end
 xlabel('Years');
 ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe');
+
+%% Comparing SST to Sea Level Change
+
+% Step 1: Average local stations for a Hawaii measurement
+
+hawaii_seaLevel_grid = NaN*zeros(length(seaLevel_grid(:,1)),2);
+hawaii_seaLevel_grid(:,1) = seaLevel_grid(:,1);
+hawaii_seaLevel_grid(:,2) = nanmean(seaLevel_grid(:,2:end),2);
+
+% Step 2: Create an array with Sea Level measurements and SST
+% SST - 1891 to 2017
+% Sea Level - 1905 to 2019
+
+seaLevel_SST_grid = NaN*zeros(113,3);
+seaLevel_SST_grid(:,1:2) = hawaii_seaLevel_grid(1:113,:);
+seaLevel_SST_grid(:,3) = sstYearlyMean(15:end);
+nooutliers = rmoutliers(seaLevel_SST_grid);
+
+% Step 3: Plot Sea Level vs SST
+
+scatter(nooutliers(:,3),nooutliers(:,2));
 
 %% Step #3: load in dataset 3 --> global monthly SST 1891-present from .nc file
 % data from NOAA
@@ -255,8 +276,9 @@ plot(sstYears(2:127,:), sstYearlyMean(2:127,:));
 
 %this plots a sample dataset from the Matlab system, will try soon with
 %actual data of importance! -GC
-trk = gpxread('sample_mixed.gpx','FeatureType','track');
+%trk = gpxread('sample_mixed.gpx','FeatureType','track');
 
+% Map buisness 
 name = 'opentopomap';
 url = 'a.tile.opentopomap.org';
 copyright = char(uint8(169));
@@ -267,12 +289,29 @@ displayName = 'Open Topo Map';
 addCustomBasemap(name,url,'Attribution',attribution,'DisplayName',displayName)
 webmap opentopomap
 
-%this plots that sample data from above
-wmline(trk,'LineWidth',2)
+for x=1:30
+    lat=Hospitals.latitude(x);
+    lon=Hospitals.longitude(x);
+    wmmarker(lat, lon);
+end
+
+%% TRYING TO PLOT POINTS
+pts = geopoint(Hospitals.latitude,Hospitals.longitude)
+gb = geobubble(Hospitals.Latitude,Hospitals.Longitude,'Basemap','opentopomap');
+gb.BubbleWidthRange = 20;
+gb.MapLayout = 'maximized';
+gb.ZoomLevel = 14;
+
+%% this plots that sample data from above
+%wmline(trk,'LineWidth',2)
+
+hold on
+geoscatter(Hospitals.latitude,Hospitals.longitude,'filled');
+geolimits([18.0 22.5],[-161.0 -154.5]);
+
 %% --> I cant get this to work rn Im just trying other basemap things
 figure(81)
 geobasemap('usgstopo');
 geolimits([18.0 22.5],[-161.0 -154.5]);
-
-%% Read in Hospital lat/lon dataset
-
+%%
+openExample('map/ViewLocationsPlacenamesBubblesOpenStreetMapExample')
