@@ -213,7 +213,7 @@ scatter(nooutliers(:,3),nooutliers(:,2));
 
 %% Step #3: load in dataset 3 --> global monthly SST 1891-present from .nc file
 % data from NOAA
-% NBB has full global data set on her comp. It runs through SSTdata
+% NBB has full global data set on her comp. It runs through HistoricSSTdata
 % info: from 1891-present
 %       this is only the Hawaiian subset
 %       3D which goes lon X lat X time

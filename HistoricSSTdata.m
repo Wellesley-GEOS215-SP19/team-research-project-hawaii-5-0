@@ -1,10 +1,16 @@
-%% Kalau, Nolen Belle, Grace
+%% 
 % This data set contains sst for 127 years from 1891 to near present
 % data smoothed for missing values
 
 % sstYearlyGlobal is the yearly averages for each 1x1 square
 % sstYearlyMean is the yearly average of the global sea surface
 
+% sstYearlyMean output saved in globalSSTmean1891_2018.cvs
+
+%Author: Nolen Belle Bryant
+%Comment from the author: Since writing this code, I found a significantly 
+%better way to deal with missing values which can be seen in FutureSSTdata,
+%just so the record is clear
 %% Global Data
 ncfile = 'sst.mon.mean.global.nc' ; % nc file name
 % To get information about the nc file
