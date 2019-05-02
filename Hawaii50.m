@@ -93,7 +93,8 @@ kawaihae = MonthToYearMean(kawaihaeData);
 honSort = rmoutliers(honolulu);
 nawSort = rmoutliers(nawiliwili);
 kahSort = rmoutliers(kahului);
-hilSort = rmoutliers(hilo);
+%hilSort = rmoutliers(hilo);
+hilSort = rmoutliers(hilo,'ThresholdFactor',2); %needed to get rid of more outliers
 mokSort = rmoutliers(mokuoloe);
 barSort = rmoutliers(barberspt);
 kauSort = rmoutliers(kaumalapau);
@@ -101,11 +102,18 @@ kawSort = rmoutliers(kawaihae);
 
 % figure(3); clf;
 % subplot(2,1,1);
+% plot(hilSort(:,1),hilSort(:,2));
+% subplot(2,1,2);
+% plot(hilSort2(:,1),hilSort2(:,2));
+% 
+% figure(4); clf;
+% subplot(2,1,1);
 % plot(honSort(:,1),honSort(:,2));
 % subplot(2,1,2);
-% plot(honolulu(:,1),honolulu(:,2));
+% plot(honSort2(:,1),honSort2(:,2));
+
 %% plotting each local sea level rise (with and without outliers)
-Classification Learne
+%Classification Learne
 placeNames = {honolulu nawiliwili kahului hilo mokuoloe barberspt kaumalapau kawaihae};
 sortedNames = {honSort, nawSort, kahSort, hilSort, mokSort, barSort, kauSort, kawSort};
 
@@ -132,10 +140,9 @@ xlabel('Years');
 ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
 
-%% make an array of years by local stations and global sea level
-% might not want to do this!
-totalYears = unique([honolulu(:,1);nawiliwili(:,1);kahului(:,1);hilo(:,1);mokuoloe(:,1);kawaihae(:,1)]);
-placeNames = {honolulu nawiliwili kahului hilo mokuoloe kawaihae};
+%% make an array of years by local stations and global sea level (after outliers removed)
+totalYears = unique([honSort(:,1);nawSort(:,1);kahSort(:,1);hilSort(:,1);mokSort(:,1);kawSort(:,1)]);
+placeNames = {honSort nawSort kahSort hilSort mokSort kawSort};
 
 seaLevel_grid = NaN*zeros(length(totalYears),7);  
 seaLevel_grid(:,1) = totalYears;
@@ -148,39 +155,40 @@ for i = 1:6
     end
 end     
 
-seaLevel_grid_nooutliers = rmoutliers(seaLevel_grid(2:end,1:end));
-
-%% plot more
+%% plot grid with no outliers (looks weird, don't use???)
 for num = 1:6
-    plot(seaLevel_grid_nooutliers(:,1),seaLevel_grid_nooutliers(:,1+num),'LineWidth',2);
+    plot(seaLevel_grid(:,1),seaLevel_grid(:,1+num),'LineWidth',2);
+    hold on
+end
+xlabel('Years');
+ylabel('Sea Level (mm)');
+legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
+
+%% Step #2c: Calculate rates of change for each station
+
+seaChange_grid = zeros(length(seaLevel_grid(:,1)),7);
+seaChange_grid(:,1) = seaLevel_grid(:,1);
+
+for i = 2:7 %station indices
+    baseValue = placeNames{i-1}(1,2);
+    seaChange_grid(:,i) = seaLevel_grid(:,i)-baseValue;
+end
+
+seaChange_grid(isnan(seaChange_grid)) = 0;
+
+% for i = 1:6
+%     baseValue = placeNames{i}(1,2);
+%     placeNames{i}(:,3) = placeNames{i}(:,2)-baseValue;
+% end
+
+%% Plotting for rates of change
+for num = 1:6
+    plot(placeNames{num}(:,1),placeNames{num}(:,3),'LineWidth',2);
     hold on
 end
 xlabel('Years');
 ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
-
-%% Step #2c: Calculate rates of change for each station
-%base year = 1957, index 53 of seaLevel_grid
-%1957 to 2019
-
-seaLevel_grid_1957 = NaN*zeros(length(seaLevel_grid(53:end,1)),6);  
-seaLevel_grid_1957(:,:) = seaLevel_grid(53:end,1:6);
-
-for i = 2:6 %station indices
-    baseValue = seaLevel_grid_1957(13,i); %1969, index 13
-    seaLevel_grid_1957(:,i) = seaLevel_grid_1957(:,i)-baseValue;
-end
-
-seaLevel_grid_1957_nooutliers = rmoutliers(seaLevel_grid_1957);
-
-%% Plotting for rates of change
-for num = 1:5
-    plot(seaLevel_grid_1957_nooutliers(:,1),seaLevel_grid_1957_nooutliers(:,1+num),'LineWidth',2);
-    hold on
-end
-xlabel('Years');
-ylabel('Sea Level (mm)')
-legend('honolulu','nawiliwili','kahului','hilo','mokuoloe');
 
 %% Comparing SST to Sea Level Change
 
