@@ -90,7 +90,7 @@ kaumalapau = MonthToYearMean(kaumalapauData);
 kawaihae = MonthToYearMean(kawaihaeData);
 %% excluding outliers
 
-honSort = filloutliers(honolulu,'linear');
+honSort = rmoutliers(honolulu);
 nawSort = rmoutliers(nawiliwili);
 kahSort = rmoutliers(kahului);
 %hilSort = rmoutliers(hilo);
@@ -111,8 +111,7 @@ kawSort = rmoutliers(kawaihae);
 % plot(honSort(:,1),honSort(:,2));
 % subplot(2,1,2);
 % plot(honSort2(:,1),honSort2(:,2));
-%% convert to CSV
-writetable(array2table(honSort),'honolulu.csv');
+
 %% plotting each local sea level rise (with and without outliers)
 %Classification Learne
 placeNames = {honolulu nawiliwili kahului hilo mokuoloe barberspt kaumalapau kawaihae};
@@ -137,7 +136,6 @@ for num = 1:6
     plot(sortedNames{num}(:,1),sortedNames{num}(:,2),'LineWidth',2);
     hold on
 end
-%plot(avgLocal(:,1),avgLocal(:,2),'LineWidth',2); %average 
 xlabel('Years');
 ylabel('Sea Level (mm)')
 legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
@@ -161,7 +159,7 @@ end
 
 avgLocal = NaN*zeros(length(totalYears),2);
 avgLocal(:,1) = totalYears;
-avgLocal(:,2) = nanmean(seaLevel_grid(:,2:7),2);
+avgLocal(:,2) = nanmean(seaLevel_grid(:,2:7));
 
 %% plot grid with no outliers (looks weird, don't use???)
 for num = 1:6
