@@ -211,22 +211,22 @@ legend('honolulu','nawiliwili','kahului','hilo','mokuoloe','kawaihae');
 
 % Step 1: Average local stations for a Hawaii measurement
 
-hawaii_seaLevel_grid = NaN*zeros(length(seaLevel_grid(:,1)),2);
-hawaii_seaLevel_grid(:,1) = seaLevel_grid(:,1);
-hawaii_seaLevel_grid(:,2) = nanmean(seaLevel_grid(:,2:end),2);
+% hawaii_seaLevel_grid = NaN*zeros(length(seaLevel_grid(:,1)),2);
+% hawaii_seaLevel_grid(:,1) = seaLevel_grid(:,1);
+% hawaii_seaLevel_grid(:,2) = nanmean(seaLevel_grid(:,2:end),2);
 
 % Step 2: Create an array with Sea Level measurements and SST
 % SST - 1891 to 2017
 % Sea Level - 1905 to 2019
 
 seaLevel_SST_grid = NaN*zeros(113,3);
-seaLevel_SST_grid(:,1:2) = hawaii_seaLevel_grid(1:113,:);
+seaLevel_SST_grid(:,1:2) = honSort(1:113,:);
 seaLevel_SST_grid(:,3) = sstYearlyMean(15:end);
-nooutliers = rmoutliers(seaLevel_SST_grid);
 
 % Step 3: Plot Sea Level vs SST
 
-scatter(nooutliers(:,3),nooutliers(:,2));
+scatter(seaLevel_SST_grid(:,3),seaLevel_SST_grid(:,2));
+%trend line equation: y=1.1e+02*x-1.4e+03
 
 %% Step #3: load in dataset 3 --> global monthly SST 1891-present from .nc file
 % data from NOAA
